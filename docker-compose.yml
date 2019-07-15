@@ -30,6 +30,9 @@ services:
           - .:/home/wwwroot/app
         environment:
           - maildev_host=app_maildev
+          - MYSQL_DATABASE=app
+          - MYSQL_USER=user
+          - MYSQL_PASSWORD=password
         depends_on:
           - maildev
           - mysql
