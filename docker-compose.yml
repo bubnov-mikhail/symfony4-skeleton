@@ -1,0 +1,52 @@
+version: '3'
+services:
+    apache:
+        build: .docker/apache
+        container_name: app_apache
+        ports:
+            - 8080:80
+        volumes:
+          - .docker/config/vhosts:/etc/apache2/sites-enabled
+          - .:/home/wwwroot/app
+        depends_on:
+          - php
+
+    mysql:
+        image: mysql
+        command: "--default-authentication-plugin=mysql_native_password"
+        container_name: app_mysql
+        volumes:
+            - .docker/data/db:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: app
+            MYSQL_USER: user
+            MYSQL_PASSWORD: password
+
+    php:
+        build: .docker/php
+        container_name: app_php
+        volumes:
+          - .:/home/wwwroot/app
+        environment:
+          - maildev_host=app_maildev
+        depends_on:
+          - maildev
+          - mysql
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: app_phpmyadmin
+        environment:
+          PMA_HOST: mysql
+          PMA_PORT: 3306
+        ports:
+            - 8081:80
+        links:
+            - mysql
+
+    maildev:
+        image: djfarrelly/maildev
+        container_name: app_maildev
+        ports:
+          - 8002:80
