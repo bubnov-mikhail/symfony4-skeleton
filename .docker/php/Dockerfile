@@ -22,6 +22,14 @@ RUN groupadd dev -g 999
 RUN useradd dev -g dev -d /home/dev -m
 RUN passwd -d dev
 
+# symfony cli is not able to create a project inside a non empty directory
+RUN symfony new --full --no-git --dir /tmp/symfony_app && \
+    cp -Rf /tmp/symfony_app/* /home/wwwroot/app && \
+    rm -Rf /tmp/symfony_app && \
+    chown -R dev:dev /home/wwwroot/app && \
+    chmod -R 777 /home/wwwroot/app/var/log/ && \
+    chmod -R 777 /home/wwwroot/app/var/cache/
+
 RUN rm -rf /var/lib/apt/lists/*
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen
