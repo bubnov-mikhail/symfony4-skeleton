@@ -31,4 +31,6 @@ And run `composer` commands as well as `symfony` commands.
 
 ## Access your application via a browser:
 
-<http://localhost:8080>
+Frontend: <http://localhost:8080>  
+Maildev server: <http://localhost:8002>  
+PMA: <http://localhost:8081>
