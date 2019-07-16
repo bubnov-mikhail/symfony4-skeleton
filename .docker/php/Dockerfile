@@ -11,6 +11,9 @@ RUN docker-php-ext-install pdo pdo_mysql zip
 
 COPY php.ini /usr/local/etc/php/php.ini
 COPY php-fpm-pool.conf 	/usr/local/etc/php/pool.d/www.conf
+COPY install_sf.sh /usr/local/bin/
+
+RUN chmod +x /usr/local/bin/install_sf.sh
 
 RUN curl -sSk https://getcomposer.org/installer | php -- --disable-tls && \
 	mv composer.phar /usr/local/bin/composer
@@ -18,23 +21,14 @@ RUN curl -sSk https://getcomposer.org/installer | php -- --disable-tls && \
 RUN wget https://get.symfony.com/cli/installer -O - | bash && \
     mv ~/.symfony/bin/symfony /usr/local/bin/symfony
 
-RUN groupadd dev -g 999
-RUN useradd dev -g dev -d /home/dev -m
-RUN passwd -d dev
+RUN groupadd dev -g 999 && \
+    useradd dev -g dev -d /home/dev -m  && \
+    passwd -d dev && \
+    echo "dev ALL=(ALL) ALL" > /etc/sudoers
 
-# symfony cli is not able to create a project inside a non empty directory
-RUN symfony new --full --no-git --dir /tmp/symfony_app && \
-    cp -Rf /tmp/symfony_app/* /home/wwwroot/app && \
-    rm -Rf /tmp/symfony_app && \
-    chown -R dev:dev /home/wwwroot/app && \
-    chmod -R 777 /home/wwwroot/app/var/log/ && \
-    chmod -R 777 /home/wwwroot/app/var/cache/
-
-RUN rm -rf /var/lib/apt/lists/*
-RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+RUN rm -rf /var/lib/apt/lists/*  && \
+    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen
-
-RUN echo "dev ALL=(ALL) ALL" > /etc/sudoers
 
 WORKDIR /home/wwwroot/
 
