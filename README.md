@@ -1,6 +1,6 @@
 # Symfony 4 in docker startkit
 
-This template is a toolkit to start a new Symfony 4.
+This template is a toolkit to start a new Symfony 4 project.
 
 ## Get rid of the Skeleton git:
 
