@@ -1,13 +1,15 @@
-FROM php:7.2.10-fpm
+FROM php:7.2-fpm
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends vim curl debconf git apt-transport-https apt-utils \
     build-essential locales acl mailutils wget zip unzip mc \
     gnupg gnupg1 gnupg2 \
     zlib1g-dev \
-    sudo
+    sudo \
+    && pecl install xdebug-2.7.1
 
-RUN docker-php-ext-install pdo pdo_mysql zip
+RUN docker-php-ext-install pdo pdo_mysql zip \
+    && docker-php-ext-enable xdebug
 
 COPY php.ini /usr/local/etc/php/php.ini
 COPY php-fpm-pool.conf 	/usr/local/etc/php/pool.d/www.conf
