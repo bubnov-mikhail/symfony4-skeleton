@@ -6,11 +6,15 @@ services:
         ports:
             - 8080:80
         volumes:
-          - .docker/config/vhosts:/etc/apache2/sites-enabled
-          - .:/home/wwwroot/app
+            - .docker/config/vhosts:/etc/apache2/sites-enabled
+            - .:/home/wwwroot/app
         depends_on:
-          - php
-
+            - php
+        networks:
+            - internal
+        environment:
+            XDEBUG_CONFIG: remote_host=192.168.220.1 remote_enable=1
+            PHP_IDE_CONFIG: serverName=Docker
     mysql:
         image: mysql
         command: "--default-authentication-plugin=mysql_native_password"
@@ -18,37 +22,58 @@ services:
         volumes:
             - .docker/data/db:/var/lib/mysql
         environment:
-            MYSQL_ROOT_PASSWORD: root
-            MYSQL_DATABASE: app
-            MYSQL_USER: user
-            MYSQL_PASSWORD: password
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_DATABASE=app
+            - MYSQL_USER=user
+            - MYSQL_PASSWORD=password
+            - PHP_IDE_CONFIG="serverName=Docker"
+        networks:
+            - internal
 
     php:
         build: .docker/php
         container_name: app_php
         volumes:
-          - .:/home/wwwroot/app
+            - .:/home/wwwroot/app
+            - ${SSH_AUTH_SOCK}:/ssh-auth.sock
         environment:
-          - maildev_host=app_maildev
-          - MAILER_URL=smtp://app_maildev:25
-          - DATABASE_URL=mysql://user:password@mysql:3306/app
+            maildev_host: app_maildev
+            MAILER_URL: smtp://app_maildev:25
+            DATABASE_URL: mysql://user:password@mysql:3306/app
+            SSH_AUTH_SOCK: /ssh-auth.sock
+            XDEBUG_CONFIG: remote_host=192.168.220.1 remote_enable=1
+            PHP_IDE_CONFIG: serverName=Docker
         depends_on:
-          - maildev
-          - mysql
+            - maildev
+            - mysql
+        networks:
+            - internal
 
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         container_name: app_phpmyadmin
         environment:
-          PMA_HOST: mysql
-          PMA_PORT: 3306
+            - PMA_HOST=mysql
+            - PMA_PORT=3306
         ports:
             - 8081:80
         links:
             - mysql
+        networks:
+            - internal
 
     maildev:
         image: djfarrelly/maildev
         container_name: app_maildev
         ports:
-          - 8002:80
+            - 8002:80
+        networks:
+            - internal
+
+networks:
+    internal:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                -   subnet: 192.168.220.0/28
