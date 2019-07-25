@@ -20,7 +20,7 @@ services:
         command: "--default-authentication-plugin=mysql_native_password"
         container_name: app_mysql
         volumes:
-            - ./docker/data/db:/var/lib/mysql
+            - mysql-data:/var/lib/mysql
         environment:
             - MYSQL_ROOT_PASSWORD=root
             - MYSQL_DATABASE=app
@@ -69,6 +69,9 @@ services:
             - 8002:80
         networks:
             - internal
+volumes:
+    mysql-data:
+        driver: local
 
 networks:
     internal:
