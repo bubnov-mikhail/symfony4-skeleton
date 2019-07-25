@@ -7,7 +7,7 @@
 
 *~
 .idea
-.docker/data/
+docker/data/
 
 ###> symfony/phpunit-bridge ###
 .phpunit
