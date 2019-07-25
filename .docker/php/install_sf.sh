@@ -8,6 +8,14 @@ symfony new --full --no-git --dir /tmp/symfony_app
 cp -Rf /tmp/symfony_app/* /home/wwwroot/app
 rm -Rf /tmp/symfony_app
 
+cd /home/wwwroot/app
+
 chown -R dev:dev /home/wwwroot/app
-chmod -R 777 /home/wwwroot/app/var/log/
-chmod -R 777 /home/wwwroot/app/var/cache/
+chmod -R 777 var/log/
+chmod -R 777 var/cache/
+
+echo "Installing symfony/phpunit-bridge"
+composer require --dev symfony/phpunit-bridge phpunit
+
+echo "Running phpunit for the first time so that the symfony/phpunit-bridge downloads the right version of phpunit..."
+bin/phpunit
