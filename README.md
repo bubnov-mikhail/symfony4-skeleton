@@ -12,7 +12,7 @@ This template is a toolkit to start a new Symfony 4 project.
     
 ## Install Symfony4
 
-    docker exec -t app_php -u dev install_sf.sh
+    docker exec -t -u dev app_php install_sf.sh
 
 ## Init a VCS for the new project
 
